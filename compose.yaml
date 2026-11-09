@@ -22,8 +22,8 @@ services:
           create_host_path: false
     networks:
       - dokploy-network
-    expose:
-      - "9010"
+    ports:
+      - "172.20.16.195:9010:9010"
     read_only: true
     tmpfs:
       - /tmp:size=16m,noexec,nosuid
