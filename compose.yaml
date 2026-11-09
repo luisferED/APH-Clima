@@ -1,0 +1,50 @@
+﻿services:
+  aph-clima:
+    build: .
+    image: aph-clima:local
+    restart: unless-stopped
+    init: true
+    environment:
+      DB_PATH: /data/tiempo_aph.db
+      HOST: 0.0.0.0
+      PUBLIC_ORIGIN: ${PUBLIC_ORIGIN:?Configura el origen HTTPS interno}
+      OPERATOR_USER: ${OPERATOR_USER:?Configura el operador}
+      OPERATOR_PASSWORD_HASH: ${OPERATOR_PASSWORD_HASH:?Genera un hash}
+      MET_USER_AGENT: ${MET_USER_AGENT:?Configura contacto real}
+    volumes:
+      - aph_clima_data:/data
+      - type: bind
+        source: ${APH_FONT_DIR:?Configura la carpeta privada de fuentes autorizadas}
+        target: /app/assets/fonts
+        read_only: true
+        bind:
+          create_host_path: false
+    networks:
+      - dokploy-network
+    expose:
+      - "9010"
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m,noexec,nosuid
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    cpus: 1.0
+    mem_limit: 256m
+    pids_limit: 96
+    deploy:
+      replicas: 1
+    stop_grace_period: 30s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+volumes:
+  aph_clima_data:
+    external: true
+    name: aph_clima_data
+networks:
+  dokploy-network:
+    external: true

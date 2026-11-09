@@ -1,0 +1,37 @@
+﻿# Aplicar junto con compose.yaml solo al habilitar acceso corporativo por IP.
+services:
+  aph-clima-tls:
+    image: caddy:2-alpine
+    user: "10001:10001"
+    restart: unless-stopped
+    environment:
+      CORPORATE_CIDRS: ${CORPORATE_CIDRS:?Indica las subredes corporativas reales separadas por espacios}
+    ports:
+      - "172.20.16.195:9443:9443"
+    volumes:
+      - ./Caddyfile.internal:/etc/caddy/Caddyfile:ro
+      - type: bind
+        source: ${APH_TLS_DIR:?Directorio de certificado y clave privados}
+        target: /certs
+        read_only: true
+        bind:
+          create_host_path: false
+    networks:
+      - dokploy-network
+    read_only: true
+    tmpfs:
+      - /config:uid=10001,gid=10001,size=8m
+      - /data:uid=10001,gid=10001,size=8m
+      - /tmp:uid=10001,gid=10001,size=8m
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    cpus: 0.5
+    mem_limit: 128m
+    pids_limit: 64
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"

@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>APH - Datos del Tiempo</title>
+    <link rel="stylesheet" href="styles.css?v=20260710-aph3">
+  </head>
+  <body class="app-shell">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Panel del operador</p>
+        <h1>APH - Datos del Tiempo</h1>
+      </div>
+      <div class="top-actions">
+        <button class="ghost-button" id="clearOutputBtn" type="button">Limpiar salida</button>
+        <a class="primary-button" id="openOutputLink" href="/output.html" target="salida_aph">Abrir salida vMix</a>
+      </div>
+    </header>
+
+    <main class="operator-layout">
+      <section class="panel status-panel">
+        <div>
+          <p class="eyebrow">Base local SQLite</p>
+          <h2>Consulta unica del clima</h2>
+          <p class="muted">Usa este boton para consultar MET Norway una sola vez y guardar los datos de los 9 departamentos. Despues la salida lee solo la base local.</p>
+        </div>
+        <button class="primary-button big-button" id="refreshWeatherBtn" type="button">Consultar y guardar 9 departamentos</button>
+        <div class="weather-cache-status" id="weatherCacheStatus">Todavia no hay datos locales.</div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header">
+          <div>
+            <p class="eyebrow">Salida al aire</p>
+            <h2>Departamentos</h2>
+          </div>
+          <div class="output-url-box">
+            <span>vMix Browser</span>
+            <a id="outputUrlText" href="/output.html" target="salida_aph">/output.html</a>
+          </div>
+        </div>
+        <fieldset class="view-selector"><legend>Salida</legend><label><input type="radio" name="weatherView" value="current" checked> Clima del día</label><label><input type="radio" name="weatherView" value="extended"> Extendido 4 días</label></fieldset>
+        <p class="output-links"><a href="/output.html?view=current" target="clima_actual">Abrir salida del día</a> · <a href="/output.html?view=extended" target="clima_extendido">Abrir salida extendida</a></p>
+        <div class="city-grid" id="weatherCityButtons"></div>
+      </section>
+
+      <section class="panel preview-panel">
+        <div class="panel-header">
+          <div>
+            <p class="eyebrow">Monitor</p>
+            <h2>Vista previa</h2>
+          </div>
+          <span class="live-pill" id="activeCityPill">Libre</span>
+        </div>
+        <div class="preview-frame">
+          <iframe id="outputPreview" src="output.html?preview=1" title="Vista previa APH"></iframe>
+        </div>
+      </section>
+    </main>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script src="app.js?v=20260710-aph3"></script>
+  </body>
+</html>

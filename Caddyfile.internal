@@ -1,0 +1,16 @@
+﻿{
+    admin off
+    auto_https off
+}
+https://:9443 {
+    tls /certs/fullchain.pem /certs/privkey.pem
+    @outside not remote_ip {$CORPORATE_CIDRS}
+    respond @outside "Acceso restringido" 403
+    header Strict-Transport-Security "max-age=31536000"
+    reverse_proxy aph-clima:9010 {
+        flush_interval -1
+    }
+    log {
+        output stdout
+    }
+}

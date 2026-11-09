@@ -1,0 +1,142 @@
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:transparent;font-family:Arial,sans-serif;letter-spacing:0}.canvas{position:absolute;left:50%;top:50%;width:1920px;height:1080px;transform-origin:center;color:#333}.climate-heading{position:absolute;left:0;top:82px;height:80px;display:flex;align-items:center}.climate-heading>b{background:linear-gradient(90deg,#004b3d,#00715a);border-radius:0 44px 44px 0;color:white;font-size:72px;width:784px;text-align:right;padding-right:164px;text-shadow:0 3px 5px #333;z-index:1}.climate-heading>span{background:#eee;border-radius:0 44px 44px 0;height:80px;display:flex;align-items:center;gap:15px;padding:0 40px;color:#555;font-size:48px;min-width:374px}.climate-heading i{width:0;height:0;border-top:23px solid transparent;border-bottom:23px solid transparent;border-left:32px solid #00d536}.daily-board{position:absolute;left:377px;top:264px;width:1188px;height:598px;background:#f7f7f7;border-radius:44px;display:grid;grid-template-columns:308px 1fr 1fr;gap:60px;padding:77px 86px 60px}.now{background:linear-gradient(#e7f9ff,white);border-radius:36px;box-shadow:-5px 5px 14px #0003;height:462px;text-align:center;padding:30px 20px}.now header,.extreme footer,.forecast header,.forecast footer{background:linear-gradient(100deg,#006b55,#003a2c);color:white;font-weight:800}.now header{border-radius:30px;font-size:38px;padding:7px 16px;width:188px;margin:auto}.now strong{display:block;font-size:116px;line-height:1}.now .wx{margin:45px auto 25px}.extreme{text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:space-between;height:434px;padding-top:25px}.extreme strong{font-size:108px;line-height:1}.extreme footer{font-size:42px;padding:2px 22px;border-radius:10px;white-space:nowrap}.forecast-row{position:absolute;left:268px;top:286px;display:grid;grid-template-columns:repeat(4,299px);gap:36px}.forecast{height:528px;border-radius:0 0 44px 44px;background:linear-gradient(white,#c4c4c4);text-align:center;padding:11px 20px 35px}.forecast header{width:188px;border-radius:30px;margin:auto;font-size:38px;position:relative;padding:7px}.forecast header small{font-size:18px;position:absolute;top:-28px;left:0;width:100%;color:#555}.forecast .wx{margin:28px auto 30px}.forecast>strong{font-size:122px;line-height:1.05;display:block}.forecast footer{border-radius:36px;margin:8px auto 0;width:228px;font-size:86px;line-height:90px}.forecast footer small{font-size:28px;margin-left:5px}.wx{width:180px;height:170px;position:relative;flex-shrink:0}.sun{position:absolute;width:126px;height:126px;left:27px;top:15px;border-radius:38%;background:radial-gradient(circle at 32% 28%,#fff8a5 0,#ffe42b 17%,#ffc000 55%,#f4a000 90%);box-shadow:inset -6px -7px 12px #ec9600,0 0 0 7px #ffd600;animation:sun-spin 14s linear infinite}.cloud{position:absolute;left:12px;top:60px;width:156px;height:62px;border-radius:50px;background:linear-gradient(#fff,#d8e0ee);box-shadow:inset -8px -9px 15px #aebed455,0 5px 8px #0001;animation:cloud-drift 4s ease-in-out infinite alternate}.cloud:before,.cloud:after{content:"";position:absolute;background:radial-gradient(circle at 35% 25%,#fff,#dce4f1);border-radius:50%;width:85px;height:85px;top:-42px;left:37px}.cloud:after{width:65px;height:65px;left:12px;top:-20px}.sunny .cloud,.sunny .drops,.sunny .bolt,.cloudy .sun,.cloudy .drops,.cloudy .bolt,.partly .drops,.partly .bolt,.rain .sun,.snow .sun,.storm .sun{display:none}.partly .sun{width:98px;height:98px;left:65px;top:0}.drops{position:absolute;left:30px;top:128px;display:flex;gap:15px}.drops b{width:12px;height:23px;background:linear-gradient(120deg,#66efff,#00a6d1);border-radius:70% 0 60% 60%;transform:rotate(25deg);animation:rain-fall 1s linear infinite}.drops b:nth-child(2n){animation-delay:-.5s}.drops b:nth-child(3){animation-delay:-.25s}.snow .drops b{border-radius:50%;background:white;box-shadow:0 0 3px #91c7ed}.bolt{display:none}.storm .bolt{display:block;position:absolute;left:82px;top:105px;width:28px;height:55px;background:#ffc900;clip-path:polygon(45% 0,100% 0,60% 45%,100% 45%,0 100%,30% 55%,0 55%);animation:lightning 2s infinite}.missing{position:absolute;top:420px;left:400px;padding:40px;background:white;font-size:40px}@keyframes sun-spin{to{transform:rotate(360deg)}}@keyframes cloud-drift{to{transform:translateX(9px)}}@keyframes rain-fall{0%{opacity:0;translate:0 -8px}25%{opacity:1}100%{opacity:0;translate:-8px 25px}}@keyframes lightning{0%,70%,100%{opacity:0}75%,85%{opacity:1}}
+.forecast-row .forecast .wx{margin:15px auto 8px}.forecast-row .forecast footer{font-size:76px;line-height:90px;display:flex;align-items:baseline;justify-content:center;gap:3px}.forecast-row .forecast footer small{font-size:26px;margin:0}
+@font-face{font-family:"Galano Grotesque";src:url("/assets/fonts/GalanoGrotesqueRegular.otf") format("opentype");font-weight:400;font-display:block}
+@font-face{font-family:"Galano Grotesque";src:url("/assets/fonts/GalanoGrotesqueBold.otf") format("opentype");font-weight:600 1000;font-display:block}
+html body,.canvas{font-family:"Galano Grotesque",Arial,sans-serif}
+.sun{border-radius:50%;aspect-ratio:1}
+
+.climate-heading {
+  background: rgba(238, 238, 238, .55);
+  border-radius: 0 44px 44px 0;
+}
+.climate-heading > span {
+  background: transparent;
+  color: #fff;
+  text-shadow: 0 2px 4px #0009;
+  width: 374px;
+  min-width: 374px;
+  padding-left: 48px;
+  padding-right: 20px;
+  white-space: nowrap;
+}
+.daily-board {
+  background: rgba(255, 255, 255, .78);
+  display: block;
+  padding: 0;
+}
+.daily-board .now {
+  position: absolute;
+  left: 86px;
+  top: 77px;
+  width: 308px;
+  box-shadow: none;
+}
+.now header {
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1;
+}
+.now .wx { margin: 45px auto 10px; }
+.daily-board .extreme {
+  position: absolute;
+  left: 501px;
+  top: 104px;
+  width: 212px;
+  height: 407px;
+  padding: 0;
+}
+.daily-board .extreme:nth-child(3) { left: 832px; }
+.daily-board .extreme .wx {
+  position: absolute;
+  top: 127px;
+  left: 16px;
+}
+.extreme footer {
+  width: 212px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1;
+}
+.forecast-row {
+  left: 286px;
+  top: 275px;
+  grid-template-columns: repeat(4, 275px);
+  gap: 59px;
+}
+.forecast-row .forecast {
+  position: relative;
+  height: 524px;
+  border-radius: 32px;
+  background: linear-gradient(rgba(255,255,255,.94), rgba(210,210,210,.74));
+  padding: 22px 23px 28px;
+}
+.forecast header {
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1;
+}
+.forecast header small { display: none; }
+.forecast-row .forecast .wx {
+  position: absolute;
+  top: 82px;
+  left: 47px;
+  margin: 0;
+}
+.forecast > strong {
+  position: absolute;
+  top: 282px;
+  left: 0;
+  width: 100%;
+  line-height: 1;
+}
+.forecast-row .forecast footer {
+  position: absolute;
+  left: 23px;
+  bottom: 28px;
+  margin: 0;
+}
+.climate-heading > b {
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  line-height: 1;
+}
+.forecast-row .forecast footer {
+  height: 90px;
+  line-height: 1;
+  align-items: center;
+  padding-top: 8px;
+}
+.forecast-row .forecast footer small {
+  align-self: center;
+  transform: translateY(12px);
+}
+
+/* Start after the output's slide so each content group has its own entrance. */
+.daily-board > article,
+.forecast-row > article {
+  animation: content-group-in 700ms cubic-bezier(.16,.85,.24,1) both;
+  animation-delay: 700ms;
+  transform-origin: center bottom;
+}
+.daily-board > article:nth-child(2),
+.forecast-row > article:nth-child(2) { animation-delay: 1100ms; }
+.daily-board > article:nth-child(3),
+.forecast-row > article:nth-child(3) { animation-delay: 1500ms; }
+.forecast-row > article:nth-child(4) { animation-delay: 1900ms; }
+
+@keyframes content-group-in {
+  0% { opacity: 0; transform: translateY(90px) scale(.88); }
+  72% { opacity: 1; transform: translateY(-10px) scale(1.02); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}

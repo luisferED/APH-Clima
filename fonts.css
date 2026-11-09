@@ -1,0 +1,15 @@
+@font-face {
+  font-family: "Galano Grotesque";
+  src: url("/assets/fonts/GalanoGrotesqueRegular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
+
+@font-face {
+  font-family: "Galano Grotesque";
+  src: url("/assets/fonts/GalanoGrotesqueBold.otf") format("opentype");
+  font-weight: 600 1000;
+  font-style: normal;
+  font-display: block;
+}
