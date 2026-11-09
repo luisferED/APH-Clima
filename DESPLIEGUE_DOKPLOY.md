@@ -1,6 +1,27 @@
-﻿# APH-Clima-2027: preparacion y despliegue
+# APH-Clima-2027: preparacion y despliegue
 
 Estado: preparado localmente; NO publicado ni desplegado. No se ha conectado al servidor Ubuntu ni modificado otro servicio. Leer AUDITORIA_Y_PRUEBAS.md antes de autorizar produccion.
+
+## Actualizacion: autenticacion opcional para https://aphclima.ed
+
+Esta seccion actualiza las indicaciones de autenticacion obligatoria de la preparacion inicial. El cambio se entrega localmente, sin push ni despliegue; no se verifico el servicio remoto.
+
+Para que el panel abra directamente sin Basic Auth de la aplicacion, configurar en el entorno del servicio aph-clima de Dokploy:
+
+```dotenv
+AUTH_ENABLED=false
+PUBLIC_ORIGIN=https://aphclima.ed
+```
+
+Conservar las demas variables, el montaje `/data`, el volumen externo `aph_clima_data` y el router HTTPS existente. No cambiar rutas de vMix: `/output.html`, `/output.html?view=current` y `/output.html?view=extended` bajo el mismo origen. PUBLIC_ORIGIN debe coincidir exactamente, sin barra final. El cambio de variable se aplica al recrear/iniciar el contenedor con el codigo actualizado; no requiere migracion ni importacion de SQLite. No se ha realizado ese paso.
+
+El valor predeterminado es `true`, tanto en Python como en Compose y .env.example. Solo el texto explicito `false` (sin distinguir mayusculas y tras quitar espacios) desactiva Basic Auth; valores ausentes, vacios, `0` o erroneos no la desactivan. Con `AUTH_ENABLED=false` no se requieren OPERATOR_USER ni OPERATOR_PASSWORD_HASH, aunque pueden conservarse para reactivar autenticacion. Con `AUTH_ENABLED=true` ambos son obligatorios y se conserva la validacion del hash actual. Para volver al modo autenticado, configurar `AUTH_ENABLED=true`, usuario y hash validos, y recrear solo este servicio.
+
+El panel y los POST pasan por la misma condicion de autenticacion. Las salidas siguen siendo de solo lectura. **Desactivar autenticacion permite a cualquier persona o programa con acceso a la aplicacion cambiar ciudad/vista, limpiar la salida y solicitar actualizaciones meteorologicas.** Las protecciones CSRF y Origin exacto, la cabecera X-APH-Request, las validaciones JSON, los limites y el bloqueo de archivos internos se mantienen en ambos modos. CSRF no reemplaza autenticacion: un cliente directo puede enviar Origin y la cabecera esperada.
+
+Antes de habilitar el modo sin autenticacion, restringir acceso a subredes corporativas aprobadas mediante un middleware IPAllowList del router de este servicio en Traefik, o firewall/ACL corporativo. No modificar Traefik global ni reglas de otros proyectos. Mantener TLS y no exponer directamente 9010; verificar las reglas Docker cuando se usa firewall del host. Si hay Basic Auth adicional en el router de Traefik o en otro proxy, AUTH_ENABLED solo controla la aplicacion: ese middleware independiente tambien debe revisarse dentro del alcance de este servicio para evitar un segundo prompt.
+
+Pruebas locales de esta actualizacion: `python -m unittest discover -s tests -v` (9 pruebas aprobadas) y compilacion Python. Incluyen valor predeterminado seguro, false explicito, arranque sin credenciales solo en modo desactivado, HTTPS/Origin obligatorio en ambos modos, panel/salidas sin desafio Basic en modo desactivado, POST permitidos sin credenciales con protecciones validas y rechazados sin Origin/cabecera o con origen ajeno. Los handlers administrativos de esa prueba se simulan para no consultar MET ni cambiar datos originales. Las demas pruebas usan una copia temporal de SQLite. No equivalen a una prueba de navegador o despliegue en Dokploy.
 
 ## Archivos finales y decisiones
 

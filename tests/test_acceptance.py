@@ -23,6 +23,7 @@ class Acceptance(unittest.TestCase):
         backup(Path('tiempo_aph.db'), server.DB_FILE, True)
         server.DB_READY = False
         server.init_db()
+        server.AUTH_ENABLED = True
         server.OPERATOR_USER = 'test'
         salt = b'1234567890123456'
         server.PASSWORD_HASH = '600000:' + salt.hex() + ':' + hashlib.pbkdf2_hmac('sha256', b'test-only-password', salt, 600000).hex()
@@ -63,6 +64,60 @@ class Acceptance(unittest.TestCase):
             self.assertEqual(self.request(path,'POST','{}',bad)[0],403)
             self.assertEqual(self.request(path,'POST','[1]',self.auth)[0],400)
         self.assertEqual(self.request('/api/state','POST','x'*8193,self.auth)[0],413)
+
+    def test_auth_enabled_environment(self):
+        with patch.dict(os.environ, {}, clear=True):
+            self.assertTrue(server.read_auth_enabled())
+        for value, expected in [('true', True), ('false', False), (' FALSE ', False), ('', True), ('0', True), ('typo', True)]:
+            with self.subTest(value=value), patch.dict(os.environ, {'AUTH_ENABLED': value}):
+                self.assertEqual(server.read_auth_enabled(), expected)
+
+    def test_auth_config_validation(self):
+        with patch.object(server, 'OPERATOR_USER', ''), patch.object(server, 'PASSWORD_HASH', ''):
+            with patch.object(server, 'AUTH_ENABLED', False):
+                server.validate_config()
+                with patch.object(server, 'PUBLIC_ORIGIN', ''):
+                    with self.assertRaises(RuntimeError): server.validate_config()
+            with patch.object(server, 'AUTH_ENABLED', True):
+                with self.assertRaises(RuntimeError): server.validate_config()
+        server.validate_config()
+        with patch.object(server, 'PASSWORD_HASH', '600000:bad:bad'):
+            with self.assertRaises((RuntimeError, ValueError)): server.validate_config()
+
+    def test_disabled_auth_preserves_csrf_and_routes(self):
+        headers = {k:v for k,v in self.auth.items() if k != 'Authorization'}
+        with patch.object(server, 'AUTH_ENABLED', False), patch.object(server, 'OPERATOR_USER', ''), patch.object(server, 'PASSWORD_HASH', ''):
+            for path in ['/', '/index.html', '/output.html', '/output.html?view=current', '/output.html?view=extended', '/weather/local', '/api/state', '/api/weather']:
+                status, _, response_headers = self.request(path)
+                self.assertEqual(status, 200, path)
+                self.assertIsNone(response_headers.get('WWW-Authenticate'))
+            stream = http.client.HTTPConnection('127.0.0.1', self.port, timeout=5)
+            try:
+                stream.request('GET', '/api/events')
+                response = stream.getresponse()
+                self.assertEqual(response.status, 200)
+                self.assertIsNone(response.headers.get('WWW-Authenticate'))
+                self.assertTrue(response.readline().startswith(b'data: '))
+                response.close()
+            finally:
+                stream.close()
+            for method in ['GET', 'HEAD']:
+                self.assertEqual(self.request('/server.py', method)[0], 404)
+                self.assertEqual(self.request('/tiempo_aph.db', method)[0], 404)
+            for path, target in [('/api/output', 'set_output_state'), ('/api/state', 'set_output_state'), ('/api/weather/refresh', 'refresh_weather_cache')]:
+                with self.subTest(path=path), patch.object(server, target, return_value={'ok':True}) as action:
+                    for bad_headers in [{}, {**headers, 'Origin':'https://evil.test'}, {k:v for k,v in headers.items() if k != 'Origin'}, {k:v for k,v in headers.items() if k != 'X-APH-Request'}]:
+                        self.assertEqual(self.request(path, 'POST', '{}', bad_headers)[0], 403)
+                    action.assert_not_called()
+                    status, body, response_headers = self.request(path, 'POST', '{}', headers)
+                    self.assertEqual(status, 200)
+                    self.assertTrue(json.loads(body)['ok'])
+                    self.assertIsNone(response_headers.get('WWW-Authenticate'))
+                    action.assert_called_once()
+            self.assertEqual(self.request('/api/state', 'POST', '[1]', headers)[0], 400)
+            self.assertEqual(self.request('/api/state', 'POST', 'x'*8193, headers)[0], 413)
+        # Enabled mode still rejects incorrect credentials.
+        self.assertEqual(self.request('/', headers={'Authorization':'Basic ' + base64.b64encode(b'test:incorrect').decode()})[0], 401)
 
     def test_sse_and_state(self):
         streams=[]

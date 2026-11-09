@@ -1,4 +1,4 @@
-﻿services:
+services:
   aph-clima:
     build: .
     image: aph-clima:local
@@ -8,8 +8,9 @@
       DB_PATH: /data/tiempo_aph.db
       HOST: 0.0.0.0
       PUBLIC_ORIGIN: ${PUBLIC_ORIGIN:?Configura el origen HTTPS interno}
-      OPERATOR_USER: ${OPERATOR_USER:?Configura el operador}
-      OPERATOR_PASSWORD_HASH: ${OPERATOR_PASSWORD_HASH:?Genera un hash}
+      AUTH_ENABLED: "${AUTH_ENABLED:-true}"
+      OPERATOR_USER: ${OPERATOR_USER:-}
+      OPERATOR_PASSWORD_HASH: ${OPERATOR_PASSWORD_HASH:-}
       MET_USER_AGENT: ${MET_USER_AGENT:?Configura contacto real}
     volumes:
       - aph_clima_data:/data

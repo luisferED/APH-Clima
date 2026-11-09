@@ -26,6 +26,14 @@ PORT = 9010
 MET_NORWAY_URL = "https://api.met.no/weatherapi/locationforecast/2.0/compact"
 MET_USER_AGENT = os.environ.get("MET_USER_AGENT", "")
 PUBLIC_ORIGIN = os.environ.get("PUBLIC_ORIGIN", "")
+
+
+def read_auth_enabled():
+    # Only an explicit false disables authentication; missing/invalid values stay secure.
+    return os.environ.get("AUTH_ENABLED", "true").strip().lower() != "false"
+
+
+AUTH_ENABLED = read_auth_enabled()
 OPERATOR_USER = os.environ.get("OPERATOR_USER", "")
 PASSWORD_HASH = os.environ.get("OPERATOR_PASSWORD_HASH", "")
 FONT_DIR = Path(os.environ.get("FONT_DIR", str(ROOT / "assets" / "fonts")))
@@ -588,6 +596,8 @@ class APHHandler(SimpleHTTPRequestHandler):
         super().end_headers()
 
     def authenticated(self):
+        if not AUTH_ENABLED:
+            return True
         try:
             scheme, value = self.headers.get("Authorization", "").split(" ", 1)
             if scheme.lower() != "basic":
@@ -727,8 +737,12 @@ class APHHandler(SimpleHTTPRequestHandler):
 
 
 def validate_config():
-    if not OPERATOR_USER or not PASSWORD_HASH or not PUBLIC_ORIGIN.startswith("https://"):
-        raise RuntimeError("Configura OPERATOR_USER, OPERATOR_PASSWORD_HASH y PUBLIC_ORIGIN HTTPS.")
+    if not PUBLIC_ORIGIN.startswith("https://"):
+        raise RuntimeError("Configura PUBLIC_ORIGIN HTTPS.")
+    if not AUTH_ENABLED:
+        return
+    if not OPERATOR_USER or not PASSWORD_HASH:
+        raise RuntimeError("Configura OPERATOR_USER y OPERATOR_PASSWORD_HASH con AUTH_ENABLED=true.")
     iterations, salt, digest = PASSWORD_HASH.split(":")
     if int(iterations) < 600000 or len(bytes.fromhex(salt)) < 16 or len(bytes.fromhex(digest)) != 32:
         raise RuntimeError("Hash de operador invalido")
